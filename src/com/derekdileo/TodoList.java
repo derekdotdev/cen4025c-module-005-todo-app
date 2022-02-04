@@ -35,18 +35,29 @@ public class TodoList {
 	}
 
 	// Get Session (use this later when refactoring)
-	public Session getSession() {
+	private Session getSession() {
 		SessionFactory sessionFactory = firstInstance.getFactory();
 		return sessionFactory.openSession();
 
+	}
+
+	private SessionFactory getFactory() {
+		return factory;
+	}
+
+	private void setFactory(SessionFactory factory) {
+		TodoList.factory = factory;
+	}
+
+	private void closeFactory() {
+		firstInstance.getFactory().close();
 	}
 
 	// Check if empty
 	@SuppressWarnings("unchecked")
 	private boolean dbEmpty() {
 
-		SessionFactory sessionFactory = firstInstance.getFactory();
-		Session session = sessionFactory.openSession();
+		Session session = firstInstance.getSession();
 		session.beginTransaction();
 
 		List<TodoItem> todoItemList = (List<TodoItem>) session.createQuery(
@@ -71,14 +82,13 @@ public class TodoList {
 			TodoItem t1 = new TodoItem();
 			t1.setDescription(description);
 
-			SessionFactory sessionFactory = firstInstance.getFactory();
-			Session session = sessionFactory.openSession();
+			Session session = firstInstance.getSession();
 			session.beginTransaction();
 			session.save(t1);
 			session.getTransaction().commit();
 			session.close();
 
-			System.out.println("Todo Item: " + description + " created!");
+			System.out.println("\nTodo Item: " + description + " created!");
 
 		} else {
 
@@ -92,8 +102,8 @@ public class TodoList {
 	public void readAllTodoItemDetails() {
 
 		if (!dbEmpty()) {
-			SessionFactory sessionFactory = firstInstance.getFactory();
-			Session session = sessionFactory.openSession();
+
+			Session session = firstInstance.getSession();
 			session.beginTransaction();
 			
 			List<TodoItem> todoItemList = (List<TodoItem>) session.createQuery(
@@ -119,11 +129,10 @@ public class TodoList {
 	// Update Todo Item by Id
 	public void updateTodoItemById(int id, String description) {
 
-		SessionFactory sessionFactory = firstInstance.getFactory();
-		Session session = sessionFactory.openSession();
+		Session session = firstInstance.getSession();
 		session.beginTransaction();
-		try {
 
+		try {
 			TodoItem item = (TodoItem) session.get(TodoItem.class, id);
 			String tempDesc = item.getDescription();
 			item.setDescription(description);
@@ -131,12 +140,11 @@ public class TodoList {
 			session.update(item);
 			session.getTransaction().commit();
 			session.close();
-			System.out.println("Todo Item Updated from: " + tempDesc + " to: " + description);
+			System.out.println("Todo Item Updated from: [ " + tempDesc + " ] to: [ " + description + " ]");
 
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			System.out.println("No Todo Item found with ID: " + id);
-
+			session.close();
 		}
 
 	}
@@ -145,11 +153,9 @@ public class TodoList {
 	public void deleteTodoItemById(int id) {
 
 		if (!dbEmpty()) {
-
-			SessionFactory sessionFactory = firstInstance.getFactory();
-			Session session = sessionFactory.openSession();
+			Session session = firstInstance.getSession();
 			session.beginTransaction();
-			// ********************* Need input validation for ID!! ************************
+
 			try {
 
 				TodoItem item = (TodoItem) session.get(TodoItem.class, id);
@@ -158,17 +164,28 @@ public class TodoList {
 				session.delete(item);
 				session.getTransaction().commit();
 				session.close();
-				System.out.println("Todo Item: " + desc + " Deleted!");
+				System.out.println("Todo Item: [ " + desc + " ] Deleted!");
 
 			} catch (Exception e) {
-//				System.out.println(e.getMessage());
 				System.out.println("No Todo Item found with ID: " + id);
 				session.close();
 			}
 
 		}
+
 	}
 
+	// Delete all Todo Items?
+	public void deleteAllTodoItems() {
+
+		if (!dbEmpty()) {
+			Session session = firstInstance.getSession();
+			session.beginTransaction();
+//			TodoItem item = (TodoItem) session.get(TodoItem.class, id);
+
+		}
+
+	}
 
 
 	// Method called from Main to run TDL App
@@ -179,9 +196,9 @@ public class TodoList {
 
 			System.out.println("\n1 - View Current Todo List");
 			System.out.println("2 - Add Todo Item ");
-			System.out.println("3 - Remove Todo Item By ID");
-			System.out.println("4 - Remove Last Todo Item");
-			System.out.println("5 - Remove Particular Todo Item");
+			System.out.println("3 - Update Todo Item By ID");
+			System.out.println("4 - Delete Todo Item By ID");
+			System.out.println("5 - Delete ALL Todo Items  <NOT CONFIGURED YET>");
 			System.out.println("6 - Exit");
 			System.out.print("\nChoice: ");
 			choice = scanner.nextInt();
@@ -220,18 +237,21 @@ public class TodoList {
 				firstInstance.createTodoItem(item);
 				break;
 			case 3:
-				System.out.print("\nPlease type in the number of the Todo item to be deleted: ");
-				int toDelete = scanner.nextInt();
-				firstInstance.deleteTodoItemById(toDelete);
-//				firstInstance.deleteFirstTodoItem();
+				System.out.print("\nPlease type in the ID of the Todo item to be updated: ");
+				int toUpdate = scanner.nextInt();
+				System.out.print("\nPlease type in the new Todo item description: ");
+				scanner.nextLine();
+				String update = scanner.nextLine();
+				firstInstance.updateTodoItemById(toUpdate, update);
 				break;
 			case 4:
-//				firstInstance.deleteLastTodoItem();
+				System.out.print("\nPlease type in the ID of the Todo item to be deleted: ");
+				int toDelete = scanner.nextInt();
+				firstInstance.deleteTodoItemById(toDelete);
 				break;
 			case 5:
-//				System.out.print("\nPlease type in the number of the Todo item to be deleted: ");
-//				int toDelete = scanner.nextInt();
-//				firstInstance.deleteTodoItemAtIndex(toDelete);
+				// How can we delete ALL???
+				System.out.print("\nTo delete all items, simply exit the program.");
 				break;
 			default:
 				System.out.println("Invalid entry...How did you even get in here??");
@@ -242,17 +262,6 @@ public class TodoList {
 
 	}
 
-	public SessionFactory getFactory() {
-		return factory;
-	}
-
-	public void setFactory(SessionFactory factory) {
-		TodoList.factory = factory;
-	}
-
-	public void closeFactory() {
-		firstInstance.getFactory().close();
-	}
 
 }
 
