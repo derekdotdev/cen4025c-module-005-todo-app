@@ -3,6 +3,7 @@ package com.derekdileo;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+// Sanity check for JDBC connectivity prior to Hibernate implementation
 public class TestJdbc {
 
 	public static void main(String[] args) {

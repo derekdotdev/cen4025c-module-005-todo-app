@@ -15,7 +15,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/istack-commons-runtime-3.0.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jandex-2.4.2.Final.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javax.activation-api-1.2.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/javax.persistence-api-2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javax.persistence-api-2.2.jar" sourcepath="/Users/derek/.m2/repository/javax/persistence/javax.persistence-api/2.2/javax.persistence-api-2.2-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-api-2.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-runtime-2.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jboss-logging-3.4.3.Final.jar"/>
