@@ -5,6 +5,9 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
+// This class isn't used because TodoList is a Singleton with its own SessionFactory
+// However, this class could be made useful in the future
+
 public class HibernateUtil {
 
 	private static SessionFactory sessionFactory = buildSessionFactory();

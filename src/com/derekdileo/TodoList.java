@@ -34,13 +34,6 @@ public class TodoList {
 		return firstInstance;
 	}
 
-	// Get Session (use this later when refactoring)
-	private Session getSession() {
-		SessionFactory sessionFactory = firstInstance.getFactory();
-		return sessionFactory.openSession();
-
-	}
-
 	private SessionFactory getFactory() {
 		return factory;
 	}
@@ -53,7 +46,13 @@ public class TodoList {
 		firstInstance.getFactory().close();
 	}
 
-	// Check if empty
+	private Session getSession() {
+		SessionFactory sessionFactory = firstInstance.getFactory();
+		return sessionFactory.openSession();
+
+	}
+
+	// Check if db is empty
 	@SuppressWarnings("unchecked")
 	private boolean dbEmpty() {
 
@@ -75,7 +74,7 @@ public class TodoList {
 	}
 
 	// Create and save a to do item
-	public void createTodoItem(String description) {
+	private void createTodoItem(String description) {
 
 		if (description != null && !description.isBlank()) {
 
@@ -88,7 +87,7 @@ public class TodoList {
 			session.getTransaction().commit();
 			session.close();
 
-			System.out.println("\nTodo Item: " + description + " created!");
+			System.out.println("\nTodo Item: [ " + description + " ] created!");
 
 		} else {
 
@@ -99,35 +98,30 @@ public class TodoList {
 
 	// Read all the saved to do items
 	@SuppressWarnings("unchecked")
-	public void readAllTodoItemDetails() {
+	private List<TodoItem> getAllTodoItemDetails() {
 
 		if (!dbEmpty()) {
 
 			Session session = firstInstance.getSession();
 			session.beginTransaction();
-			
-			List<TodoItem> todoItemList = (List<TodoItem>) session.createQuery(
-					
-					"FROM TodoItem").list();
-			
-			System.out.println("\n*** Todo Item Details ***");
-			
-			for (TodoItem item : todoItemList) {
 
-				System.out.println("\nTodo ID: " + item.getId() + " Todo Desc.   : " + item.getDescription());
-			}
-			
+			List<TodoItem> todoItemList = (List<TodoItem>) session.createQuery(
+
+					"FROM TodoItem").list();
+
 			session.getTransaction().commit();
 			session.close();
+			return todoItemList;
 
 		} else {
 			System.out.println("\nThe TDL is currently empty. Please add some items and get to work!");
+			return null;
 		}
 
 	}
 
-	// Update Todo Item by Id
-	public void updateTodoItemById(int id, String description) {
+	// Update to do item by Id
+	private void updateTodoItemById(int id, String description) {
 
 		Session session = firstInstance.getSession();
 		session.beginTransaction();
@@ -149,8 +143,8 @@ public class TodoList {
 
 	}
 
-	// Delete Todo Item by Id
-	public void deleteTodoItemById(int id) {
+	// Delete to do item by Id
+	private void deleteTodoItemById(int id) {
 
 		if (!dbEmpty()) {
 			Session session = firstInstance.getSession();
@@ -175,18 +169,18 @@ public class TodoList {
 
 	}
 
-	// Delete all Todo Items?
-	public void deleteAllTodoItems() {
+	// Delete all to do items
+	private void deleteAllTodoItems() {
 
 		if (!dbEmpty()) {
-			Session session = firstInstance.getSession();
-			session.beginTransaction();
-//			TodoItem item = (TodoItem) session.get(TodoItem.class, id);
-
+			List<TodoItem> todoItems = firstInstance.getAllTodoItemDetails();
+			
+			for (TodoItem item : todoItems) {
+				int id = item.getId();
+				firstInstance.deleteTodoItemById(id);
+			}
 		}
-
 	}
-
 
 	// Method called from Main to run TDL App
 	@SuppressWarnings("resource")
@@ -228,7 +222,13 @@ public class TodoList {
 		if (firstInstance.getFactory() != null) {
 			switch (choice) {
 			case 1:
-				firstInstance.readAllTodoItemDetails();
+				List<TodoItem> items = firstInstance.getAllTodoItemDetails();
+				if (items != null) {
+					for (TodoItem item : items) {
+						System.out.println(
+								"\nTodo Item ID: " + item.getId() + "    Description: " + item.getDescription());
+					}
+				}
 				break;
 			case 2:
 				System.out.print("\nPlease type in the Todo item to be added: ");
@@ -250,8 +250,7 @@ public class TodoList {
 				firstInstance.deleteTodoItemById(toDelete);
 				break;
 			case 5:
-				// How can we delete ALL???
-				System.out.print("\nTo delete all items, simply exit the program.");
+				firstInstance.deleteAllTodoItems();
 				break;
 			default:
 				System.out.println("Invalid entry...How did you even get in here??");
@@ -265,8 +264,7 @@ public class TodoList {
 
 }
 
-//
-//
+//These are the methods which were used when TodoList Singleton contained an ArrayList<TodoItems>
 //
 //private ArrayList<TodoItem> getTodoList() {
 //	return firstInstance.todoList;

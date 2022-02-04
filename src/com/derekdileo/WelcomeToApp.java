@@ -8,11 +8,4 @@ public class WelcomeToApp {
 		WelcomeToApp.welcomeMessage = welcomeMessage;
 	}
 
-//	public void welcomeToApp() {
-//
-//		System.out.println();
-//		System.out.println("\nPlease select from the following options:");
-//
-//	}
-
 }
