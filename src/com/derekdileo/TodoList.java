@@ -118,18 +118,26 @@ public class TodoList {
 
 	// Update Todo Item by Id
 	public void updateTodoItemById(int id, String description) {
+
 		SessionFactory sessionFactory = firstInstance.getFactory();
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
+		try {
 
-		TodoItem item = (TodoItem) session.get(TodoItem.class, id);
-		String tempDesc = item.getDescription();
-		item.setDescription(description);
+			TodoItem item = (TodoItem) session.get(TodoItem.class, id);
+			String tempDesc = item.getDescription();
+			item.setDescription(description);
 
-		session.update(item);
-		session.getTransaction().commit();
-		session.close();
-		System.out.println("Todo Item Updated from: " + tempDesc + " to: " + description);
+			session.update(item);
+			session.getTransaction().commit();
+			session.close();
+			System.out.println("Todo Item Updated from: " + tempDesc + " to: " + description);
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.out.println("No Todo Item found with ID: " + id);
+
+		}
 
 	}
 
@@ -138,19 +146,25 @@ public class TodoList {
 
 		if (!dbEmpty()) {
 
-			// ********************* Need input validation for ID!! ************************
-
 			SessionFactory sessionFactory = firstInstance.getFactory();
 			Session session = sessionFactory.openSession();
 			session.beginTransaction();
+			// ********************* Need input validation for ID!! ************************
+			try {
 
-			TodoItem item = (TodoItem) session.get(TodoItem.class, id);
-			String desc = item.getDescription();
+				TodoItem item = (TodoItem) session.get(TodoItem.class, id);
+				String desc = item.getDescription();
 
-			session.delete(item);
-			session.getTransaction().commit();
-			session.close();
-			System.out.println("Todo Item: " + desc + " Deleted!");
+				session.delete(item);
+				session.getTransaction().commit();
+				session.close();
+				System.out.println("Todo Item: " + desc + " Deleted!");
+
+			} catch (Exception e) {
+//				System.out.println(e.getMessage());
+				System.out.println("No Todo Item found with ID: " + id);
+				session.close();
+			}
 
 		}
 	}
