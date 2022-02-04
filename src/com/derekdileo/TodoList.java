@@ -192,7 +192,7 @@ public class TodoList {
 			System.out.println("2 - Add Todo Item ");
 			System.out.println("3 - Update Todo Item By ID");
 			System.out.println("4 - Delete Todo Item By ID");
-			System.out.println("5 - Delete ALL Todo Items  <NOT CONFIGURED YET>");
+			System.out.println("5 - Delete ALL Todo Items");
 			System.out.println("6 - Exit");
 			System.out.print("\nChoice: ");
 			choice = scanner.nextInt();
@@ -250,7 +250,17 @@ public class TodoList {
 				firstInstance.deleteTodoItemById(toDelete);
 				break;
 			case 5:
-				firstInstance.deleteAllTodoItems();
+				System.out.println("Are you sure you want to delete everything? (This action cannot be undone)");
+				System.out.println("Enter Y or N");
+				scanner.nextLine();
+				String reply = scanner.nextLine();
+
+				if (reply.toUpperCase().equals("Y")) {
+					firstInstance.deleteAllTodoItems();
+				} else {
+					System.out.println("Todo items NOT deleted.");
+				}
+
 				break;
 			default:
 				System.out.println("Invalid entry...How did you even get in here??");
