@@ -15,7 +15,6 @@ public class Main {
 		System.out.println(WelcomeToApp.welcomeMessage);
 		
 		try {
-
 			// Enter looped menu program
 			list.toDoMenu(0);
 
@@ -23,7 +22,6 @@ public class Main {
 			e.printStackTrace();
 		}
 		
-
 
 	}
 
